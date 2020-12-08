@@ -2,6 +2,11 @@
 
 **A build tool for injecting env variables on build**
 
+## Goals
+
+- [ ] All in one build tool that can do all the copying and removing its self.
+- [ ] Define your own steps for the build process.
+
 ## Getting started
 
 for the lines, which you want to inject the variable into. Include this above the variable declaration:
