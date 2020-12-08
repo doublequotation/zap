@@ -37,6 +37,9 @@ func build() {
 func main() {
 	flags := args.ArgParser(os.Args[1:])
 	var aval []valid
+	if len(flags) == 0 {
+		fmt.Println("zap [-env <variables,...>][-in <filename>]")
+	}
 	for _, flag := range flags {
 		if flag.Flag == "-env" {
 			if flag.Param != "" {
