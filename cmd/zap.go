@@ -4,15 +4,34 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 
 	args "github.com/ashtyn3/zap/arg-parser"
 )
 
+var path string
+
 type valid struct {
 	Name  string
 	Value string
+}
+
+func build() {
+	cmd := exec.Command("go", "build")
+	cmd.Env = append(os.Environ(), "GOPATH="+os.Getenv("GOPATH"))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stdin
+	cmd.Run()
+	rm := exec.Command("rm", path)
+	rm.Stdout = os.Stdout
+	rm.Stderr = os.Stdin
+	rm.Run()
+	mv := exec.Command("mv", path+".copy", path)
+	mv.Stdout = os.Stdout
+	mv.Stderr = os.Stderr
+	mv.Run()
 }
 
 func main() {
@@ -27,14 +46,19 @@ func main() {
 					aval = append(aval, valid{Name: tv[0], Value: tv[1]})
 				}
 			}
-		} else if flag.Flag == "-in" {
+		}
+		if flag.Flag == "-in" {
 			// fmt.Println(flag.Param)
 			// f, _ := os.OpenFile(flag.Param, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			contentB, err := ioutil.ReadFile(flag.Param)
 			if err != nil {
 				fmt.Println(err)
 			}
-			ioutil.WriteFile(flag.Param+".copy", []byte(contentB), 0644)
+			er := ioutil.WriteFile(flag.Param+".copy", []byte(contentB), 0644)
+			if er != nil {
+				fmt.Println(er)
+			}
+			path = flag.Param
 			content := string(contentB)
 			sN := strings.Split(content, "\n")
 			for i, line := range sN {
@@ -58,9 +82,7 @@ func main() {
 
 			file := strings.Join(sN, "\n")
 			ioutil.WriteFile(flag.Param, []byte(file), 0644)
-		} else {
-			fmt.Println("Bad flag")
+			build()
 		}
 	}
-
 }
